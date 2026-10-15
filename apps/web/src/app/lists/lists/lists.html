@@ -1,0 +1,129 @@
+<main>
+  <header>
+    <h1>My lists</h1>
+    <button type="button" class="new" (click)="startCreate()">
+      <svg
+        aria-hidden="true"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.4"
+        stroke-linecap="round"
+      >
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+      New list
+    </button>
+  </header>
+
+  @if (creating()) {
+  <form class="inline" (submit)="$event.preventDefault(); create(name.value)">
+    <label class="sr-only" for="new-list">List name</label>
+    <input
+      #name
+      id="new-list"
+      class="field"
+      maxlength="60"
+      autofocus
+      placeholder="List name"
+      autocomplete="off"
+      (keydown.escape)="cancel()"
+      [attr.aria-invalid]="error() ? true : null"
+      [attr.aria-describedby]="error() ? 'list-error' : null"
+    />
+    <button type="submit" class="act primary">Save</button>
+    <button type="button" class="act" (click)="cancel()">Cancel</button>
+  </form>
+  } @if (error()) {
+  <p id="list-error" class="field-error" role="alert">{{ error() }}</p>
+  } @if (failed()) {
+  <div class="state">
+    <p>Couldn't load your lists.</p>
+    <button type="button" class="submit" (click)="load()">Retry</button>
+  </div>
+  } @else if (!loaded()) {
+  <p class="state" role="status">Loading…</p>
+  } @else {
+  <ul>
+    @if (favorites(); as fav) {
+    <li>
+      <a class="fav" routerLink="/" [queryParams]="{ filter: 'favorites' }">
+        <span aria-hidden="true" class="tile white">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linejoin="round"
+          >
+            <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />
+          </svg>
+        </span>
+        <span class="text">
+          <span class="name">Favorites</span>
+          <span class="count"
+            >{{ fav.recipeCount === 1 ? '1 recipe' : fav.recipeCount + ' recipes' }} · always
+            here</span
+          >
+        </span>
+      </a>
+    </li>
+    } @for (l of custom(); track l.id; let i = $index) {
+    <li class="row">
+      @if (renamingId() === l.id) {
+      <form class="inline" (submit)="$event.preventDefault(); rename(l.id, edit.value)">
+        <label class="sr-only" [for]="'rename-' + l.id">New name for {{ l.name }}</label>
+        <input
+          #edit
+          [id]="'rename-' + l.id"
+          class="field"
+          maxlength="60"
+          autofocus
+          [value]="l.name"
+          autocomplete="off"
+          (keydown.escape)="cancel()"
+          [attr.aria-invalid]="error() ? true : null"
+          [attr.aria-describedby]="error() ? 'list-error' : null"
+        />
+      </form>
+      } @else {
+      <a class="link" [routerLink]="['/lists', l.id]">
+        <span aria-hidden="true" class="tile" [style.background]="tone(i)"
+          >{{ l.name.charAt(0).toUpperCase() }}</span
+        >
+        <span class="text">
+          <span class="name">{{ l.name }}</span>
+          <span class="count">{{ count(l) }}</span>
+        </span>
+      </a>
+      }
+      <button
+        type="button"
+        class="menu-btn"
+        [attr.aria-label]="'Rename or delete ' + l.name"
+        aria-haspopup="menu"
+        [attr.aria-expanded]="menuId() === l.id"
+        (click)="toggleMenu($event, l.id)"
+      >
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="5" r="1.8" />
+          <circle cx="12" cy="12" r="1.8" />
+          <circle cx="12" cy="19" r="1.8" />
+        </svg>
+      </button>
+      @if (menuId() === l.id) {
+      <div class="menu" role="menu" (click)="$event.stopPropagation()">
+        <button type="button" role="menuitem" (click)="startRename(l.id)">Rename</button>
+        <button type="button" role="menuitem" class="del" (click)="remove(l)">Delete</button>
+      </div>
+      }
+    </li>
+    }
+  </ul>
+  }
+</main>
+<app-confirm-dialog />

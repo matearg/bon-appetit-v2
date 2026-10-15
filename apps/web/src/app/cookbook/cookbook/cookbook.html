@@ -1,0 +1,97 @@
+<main>
+  <div class="head">
+    @if (id()) {
+    <a class="back" routerLink="/lists">&larr; Back to lists</a>
+    }
+    <h1>{{ id() ? (listName() ?? '') : 'Your cookbook' }}</h1>
+    @if (!notFound()) {
+    <p class="sub">{{ subtitle() }}</p>
+    }
+  </div>
+
+  @if (!id()) {
+  <nav aria-label="Lists" class="chips">
+    <a
+      class="chip"
+      routerLink="/"
+      [class.on]="!favorites()"
+      [attr.aria-current]="favorites() ? null : 'page'"
+      >All recipes</a
+    >
+    <a
+      class="chip"
+      routerLink="/"
+      [queryParams]="{ filter: 'favorites' }"
+      [class.on]="favorites()"
+      [attr.aria-current]="favorites() ? 'page' : null"
+    >
+      <svg
+        aria-hidden="true"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linejoin="round"
+        class="heart"
+      >
+        <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />
+      </svg>
+      Favorites
+    </a>
+    <a class="chip" routerLink="/lists">
+      Your lists
+      <svg
+        aria-hidden="true"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M9 6l6 6-6 6" />
+      </svg>
+    </a>
+  </nav>
+  }
+
+  <p class="toast" aria-live="polite">{{ message() }}</p>
+
+  @if (notFound()) {
+  <div class="state">
+    <h2>List not found</h2>
+    <a routerLink="/lists">Back to lists</a>
+  </div>
+  } @else if (failed()) {
+  <div class="state">
+    <p>Couldn't load your recipes.</p>
+    <button type="button" class="submit" (click)="retry()">Retry</button>
+  </div>
+  } @else if (loading() && !visible().length) {
+  <p class="state" role="status">Loading…</p>
+  } @else if (!visible().length) {
+  <div class="state">
+    @if (q()) {
+    <h2>No recipes match "{{ q() }}"</h2>
+    } @else if (id()) {
+    <h2>This list is empty</h2>
+    } @else if (favorites()) {
+    <h2>No favorites yet</h2>
+    <p>Tap the heart on a recipe to keep it here.</p>
+    } @else {
+    <h2>Your cookbook is empty</h2>
+    <a class="new" routerLink="/recipes/new">New recipe</a>
+    }
+  </div>
+  } @else {
+  <section aria-label="Recipes" class="grid" [attr.aria-busy]="loading()">
+    @for (r of visible(); track r.id) {
+    <app-recipe-card [recipe]="r" (toggleFavorite)="toggleFavorite(r)" />
+    }
+  </section>
+  }
+</main>
