@@ -60,17 +60,6 @@ a:hover {
   box-shadow: 0 12px 28px rgb(27 31 26 / 0.1);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .lift {
-    transition:
-      transform 0.25s ease,
-      box-shadow 0.25s ease;
-  }
-  .lift:hover {
-    transform: translateY(-4px);
-  }
-}
-
 @keyframes rise {
   from {
     opacity: 0;
@@ -93,6 +82,14 @@ a:hover {
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
+    .lift {
+      transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+    }
+    .lift:hover {
+      transform: translateY(-4px);
+    }
     .reveal {
       animation: rise linear both;
       animation-timeline: view();

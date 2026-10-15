@@ -12,4 +12,8 @@ describe('fitWithin', () => {
   it('scales a portrait image by its height', () => {
     expect(fitWithin(1000, 4000, 1600)).toEqual({ width: 400, height: 1600 });
   });
+
+  it('never rounds an extreme aspect ratio down to 0 px', () => {
+    expect(fitWithin(1, 4000, 1600).width).toBeGreaterThanOrEqual(1);
+  });
 });

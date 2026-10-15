@@ -1,12 +1,18 @@
 import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, linkedSignal } from '@angular/core';
 import type { ListSummary } from '@bonappetit/shared';
 import { firstValueFrom } from 'rxjs';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class ListsService {
   private readonly http = inject(HttpClient);
-  readonly lists = signal<ListSummary[]>([]);
+  private readonly user = inject(AuthService).user;
+  /** Belongs to the current user: emptied whenever the user changes (logout, 401, other login). */
+  readonly lists = linkedSignal<unknown, ListSummary[]>({
+    source: this.user,
+    computation: () => [],
+  });
   readonly favoritesId = computed(() => this.lists().find((l) => l.isFavorites)?.id);
 
   async refresh(): Promise<void> {
