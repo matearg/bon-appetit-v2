@@ -33,6 +33,7 @@ export class Cookbook {
   private readonly listsLoaded = signal(false);
   private readonly listsFailed = signal(false);
   protected readonly message = signal('');
+  private messageTimer?: ReturnType<typeof setTimeout>;
 
   protected readonly recipes = rxResource({
     params: () => {
@@ -50,6 +51,9 @@ export class Cookbook {
 
   protected readonly visible = computed(() =>
     this.recipes.hasValue() ? this.recipes.value() : [],
+  );
+  protected readonly heading = computed(() =>
+    !this.id() ? 'Your cookbook' : this.notFound() ? 'List not found' : (this.listName() ?? 'List'),
   );
   protected readonly notFound = computed(() => {
     const e = this.recipes.error()?.cause ?? this.recipes.error();
@@ -88,9 +92,9 @@ export class Cookbook {
   protected async toggleFavorite(r: RecipeSummary): Promise<void> {
     const favoritesId = this.listsApi.favoritesId();
     if (!favoritesId) return;
-    const before = this.visible();
+    const index = this.visible().findIndex((x) => x.id === r.id);
     const now = !r.isFavorite;
-    const next = before.map((x) => (x.id === r.id ? { ...x, isFavorite: now } : x));
+    const next = this.visible().map((x) => (x.id === r.id ? { ...x, isFavorite: now } : x));
     // On the Favorites view an un-hearted recipe leaves the grid.
     this.recipes.set(this.favorites() && !now ? next.filter((x) => x.id !== r.id) : next);
     try {
@@ -98,9 +102,16 @@ export class Cookbook {
         ? this.listsApi.add(favoritesId, r.id)
         : this.listsApi.removeRecipe(favoritesId, r.id));
     } catch {
-      this.recipes.set(before);
+      // Revert only this card against the current grid, so other toggles' results survive.
+      const cur = this.visible();
+      this.recipes.set(
+        cur.some((x) => x.id === r.id)
+          ? cur.map((x) => (x.id === r.id ? { ...x, isFavorite: r.isFavorite } : x))
+          : [...cur.slice(0, index), r, ...cur.slice(index)],
+      );
       this.message.set(`Couldn't update Favorites. Try again.`);
-      setTimeout(() => this.message.set(''), 4000);
+      clearTimeout(this.messageTimer);
+      this.messageTimer = setTimeout(() => this.message.set(''), 4000);
     }
   }
 }

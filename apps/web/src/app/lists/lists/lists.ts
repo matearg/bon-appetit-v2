@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { ListSummary } from '@bonappetit/shared';
 import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
@@ -11,11 +11,14 @@ const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
   imports: [RouterLink, ConfirmDialog],
   templateUrl: './lists.html',
   styleUrl: './lists.css',
-  host: { '(document:click)': 'menuId.set(null)', '(document:keydown.escape)': 'menuId.set(null)' },
+  host: { '(document:click)': 'menuId.set(null)', '(document:keydown.escape)': 'closeMenu()' },
 })
 export class Lists {
   private readonly api = inject(ListsService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly confirm = viewChild.required(ConfirmDialog);
+  private readonly createInput = viewChild<ElementRef<HTMLInputElement>>('name');
+  private readonly renameInput = viewChild<ElementRef<HTMLInputElement>>('edit');
 
   protected readonly favorites = computed(() => this.api.lists().find((l) => l.isFavorites));
   protected readonly custom = computed(() => this.api.lists().filter((l) => !l.isFavorites));
@@ -28,6 +31,12 @@ export class Lists {
   protected readonly error = signal('');
 
   constructor() {
+    // `autofocus` is unreliable on inputs inserted after load, so focus them explicitly.
+    effect(() => {
+      const input = (this.createInput() ?? this.renameInput())?.nativeElement;
+      input?.focus();
+      input?.select();
+    });
     void this.load();
   }
 
@@ -47,6 +56,13 @@ export class Lists {
 
   protected tone(i: number): string {
     return `var(--tone-${(i % 5) + 1})`;
+  }
+
+  /** Escape closes an open menu and gives focus back to its ⋮ button. */
+  protected closeMenu(): void {
+    if (this.menuId() === null) return;
+    this.host.nativeElement.querySelector<HTMLElement>('.menu-btn[aria-expanded="true"]')?.focus();
+    this.menuId.set(null);
   }
 
   protected toggleMenu(event: Event, id: string): void {

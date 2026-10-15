@@ -129,7 +129,7 @@ ul {
   border-radius: var(--radius-input);
   background: var(--surface);
   border: 1px solid var(--border);
-  box-shadow: 0 12px 28px rgb(27 31 26 / 0.12);
+  box-shadow: 0 12px 28px var(--shadow);
 }
 .menu button {
   height: 44px;

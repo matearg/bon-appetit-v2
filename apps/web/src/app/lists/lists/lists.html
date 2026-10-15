@@ -26,7 +26,6 @@
       id="new-list"
       class="field"
       maxlength="60"
-      autofocus
       placeholder="List name"
       autocomplete="off"
       (keydown.escape)="cancel()"
@@ -82,7 +81,6 @@
           [id]="'rename-' + l.id"
           class="field"
           maxlength="60"
-          autofocus
           [value]="l.name"
           autocomplete="off"
           (keydown.escape)="cancel()"

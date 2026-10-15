@@ -3,7 +3,7 @@
     @if (id()) {
     <a class="back" routerLink="/lists">&larr; Back to lists</a>
     }
-    <h1>{{ id() ? (listName() ?? '') : 'Your cookbook' }}</h1>
+    <h1>{{ heading() }}</h1>
     @if (!notFound()) {
     <p class="sub">{{ subtitle() }}</p>
     }
