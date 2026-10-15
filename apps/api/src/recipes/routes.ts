@@ -9,7 +9,7 @@ import { HttpError, validationHook } from '../http/errors.js';
 
 type RecipeRow = typeof recipes.$inferSelect;
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const notFound = () => new HttpError(404, 'not_found', 'Recipe not found');
 
 // Shared with lists and photos: the recipe row, or 404 if the id is malformed, missing or not theirs.

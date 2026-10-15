@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { csrf } from 'hono/csrf';
 import { authRoutes } from './auth/routes.js';
+import { listRoutes } from './lists/routes.js';
 import { recipeRoutes } from './recipes/routes.js';
 import type { Db } from './db/client.js';
 import { onError } from './http/errors.js';
@@ -31,6 +32,7 @@ export function createApp(deps: AppDeps) {
   api.get('/health', (c) => c.json({ ok: true }));
   api.route('/auth', authRoutes);
   api.route('/recipes', recipeRoutes);
+  api.route('/lists', listRoutes);
   app.route('/api', api);
 
   app.onError(onError);

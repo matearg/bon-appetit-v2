@@ -26,7 +26,7 @@ function inviteCodeMatches(given: string, configured: string): boolean {
 // Verified against on unknown emails so login takes as long as for a real account.
 const dummyHash = hashPassword('not-a-real-password');
 
-function isUniqueViolation(err: unknown): boolean {
+export function isUniqueViolation(err: unknown): boolean {
   // drizzle wraps the postgres error in `cause`.
   for (let e: unknown = err; e instanceof Error; e = e.cause) {
     if ((e as { code?: unknown }).code === '23505') return true;
