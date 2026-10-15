@@ -25,6 +25,7 @@
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx --env-file=.env src/db/migrate.ts",
+    "db:seed": "tsx --env-file=.env src/seed.ts",
     "build": "tsc -p tsconfig.json"
   }
 }
