@@ -4,6 +4,8 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { apiError } from '../api-error';
 
+const REQUIRED = { email: 'Enter your email', password: 'Enter your password' } as const;
+
 @Component({
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
@@ -18,11 +20,20 @@ export class Login {
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
   });
+  protected readonly submitted = signal(false);
   protected readonly busy = signal(false);
   protected readonly error = signal('');
 
+  protected fieldError(name: keyof typeof REQUIRED): string | null {
+    const control = this.form.controls[name];
+    if (!this.submitted() || control.valid) return null;
+    return control.hasError('email') ? 'Enter a valid email' : REQUIRED[name];
+  }
+
   async submit(): Promise<void> {
-    if (this.busy() || this.form.invalid) return;
+    if (this.busy()) return;
+    this.submitted.set(true);
+    if (this.form.invalid) return;
     this.busy.set(true);
     this.error.set('');
     try {

@@ -5,8 +5,8 @@
   aria-describedby="confirm-message"
   (cancel)="finish(false)"
 >
-  <h2 id="confirm-title" class="section-title">{{ opts().title }}</h2>
-  <p id="confirm-message" class="lead">{{ opts().message }}</p>
+  <h2 id="confirm-title" class="confirm-title">{{ opts().title }}</h2>
+  <p id="confirm-message" class="confirm-message">{{ opts().message }}</p>
   <div class="confirm-actions">
     <button type="button" class="submit confirm-cancel" autofocus (click)="finish(false)">
       Cancel

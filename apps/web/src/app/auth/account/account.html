@@ -6,7 +6,7 @@
 
   <p class="lead">Signed in as {{ auth.user()?.email }}</p>
 
-  <form class="form" [formGroup]="form" (ngSubmit)="changePassword()">
+  <form class="form" [formGroup]="form" (ngSubmit)="changePassword()" novalidate>
     <h2 class="section-title">Change password</h2>
     <div class="row">
       <label for="account-current">Current password</label>
@@ -16,7 +16,12 @@
         type="password"
         autocomplete="current-password"
         formControlName="currentPassword"
+        [attr.aria-invalid]="!!fieldError('currentPassword')"
+        [attr.aria-describedby]="fieldError('currentPassword') ? 'account-current-error' : null"
       />
+      @if (fieldError('currentPassword'); as msg) {
+      <p id="account-current-error" class="field-error">{{ msg }}</p>
+      }
     </div>
     <div class="row">
       <label for="account-new">New password</label>
@@ -26,10 +31,10 @@
         type="password"
         autocomplete="new-password"
         formControlName="newPassword"
-        [attr.aria-invalid]="!!fieldErrors()['newPassword']"
-        [attr.aria-describedby]="fieldErrors()['newPassword'] ? 'account-new-error' : null"
+        [attr.aria-invalid]="!!fieldError('newPassword')"
+        [attr.aria-describedby]="fieldError('newPassword') ? 'account-new-error' : null"
       />
-      @if (fieldErrors()['newPassword']; as msg) {
+      @if (fieldError('newPassword'); as msg) {
       <p id="account-new-error" class="field-error">{{ msg }}</p>
       }
     </div>
@@ -37,6 +42,7 @@
       class="message"
       [class.ok]="message()?.ok"
       [class.error]="message()?.ok === false"
+      role="status"
       aria-live="polite"
     >
       {{ message()?.text }}

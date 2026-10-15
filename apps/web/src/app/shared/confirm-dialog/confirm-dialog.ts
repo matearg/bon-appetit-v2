@@ -10,7 +10,7 @@ export interface ConfirmOptions {
 @Component({
   selector: 'app-confirm-dialog',
   templateUrl: './confirm-dialog.html',
-  styleUrls: ['../../auth/auth.css', './confirm-dialog.css'],
+  styleUrls: ['./confirm-dialog.css'],
 })
 export class ConfirmDialog {
   private readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
@@ -23,9 +23,11 @@ export class ConfirmDialog {
 
   /** Opens the dialog; resolves true on confirm, false on cancel or Escape. */
   open(opts: ConfirmOptions): Promise<boolean> {
-    this.resolve?.(false);
+    const el = this.dialog().nativeElement;
+    // A second open() while shown would throw from showModal(); settle the first one as cancelled.
+    if (el.open) this.finish(false);
     this.opts.set(opts);
-    this.dialog().nativeElement.showModal();
+    el.showModal();
     return new Promise((resolve) => (this.resolve = resolve));
   }
 

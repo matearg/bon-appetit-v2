@@ -3,7 +3,7 @@
   <h1 class="headline">Join the cookbook.</h1>
   <p class="lead">Create an account with your invite code.</p>
 
-  <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+  <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <div class="row">
       <label for="signup-email">Email</label>
       <input
@@ -13,10 +13,10 @@
         autocomplete="email"
         placeholder="you@example.com"
         formControlName="email"
-        [attr.aria-invalid]="!!fieldErrors()['email']"
-        [attr.aria-describedby]="fieldErrors()['email'] ? 'signup-email-error' : null"
+        [attr.aria-invalid]="!!fieldError('email')"
+        [attr.aria-describedby]="fieldError('email') ? 'signup-email-error' : null"
       />
-      @if (fieldErrors()['email']; as msg) {
+      @if (fieldError('email'); as msg) {
       <p id="signup-email-error" class="field-error">{{ msg }}</p>
       }
     </div>
@@ -28,10 +28,10 @@
         type="password"
         autocomplete="new-password"
         formControlName="password"
-        [attr.aria-invalid]="!!fieldErrors()['password']"
-        [attr.aria-describedby]="fieldErrors()['password'] ? 'signup-password-error' : null"
+        [attr.aria-invalid]="!!fieldError('password')"
+        [attr.aria-describedby]="fieldError('password') ? 'signup-password-error' : null"
       />
-      @if (fieldErrors()['password']; as msg) {
+      @if (fieldError('password'); as msg) {
       <p id="signup-password-error" class="field-error">{{ msg }}</p>
       }
     </div>
@@ -43,14 +43,14 @@
         type="text"
         autocomplete="off"
         formControlName="inviteCode"
-        [attr.aria-invalid]="!!fieldErrors()['inviteCode']"
-        [attr.aria-describedby]="fieldErrors()['inviteCode'] ? 'signup-invite-error' : null"
+        [attr.aria-invalid]="!!fieldError('inviteCode')"
+        [attr.aria-describedby]="fieldError('inviteCode') ? 'signup-invite-error' : null"
       />
-      @if (fieldErrors()['inviteCode']; as msg) {
+      @if (fieldError('inviteCode'); as msg) {
       <p id="signup-invite-error" class="field-error">{{ msg }}</p>
       }
     </div>
-    <p class="message error" role="alert" aria-live="polite">{{ error() }}</p>
+    <p class="message error" role="status" aria-live="polite">{{ error() }}</p>
     <button class="submit" type="submit" [disabled]="busy()">Create account</button>
   </form>
 

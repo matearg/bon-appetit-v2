@@ -10,6 +10,9 @@
   --primary-hover: #1f4a28;
   --favorite: #d2462a;
   --danger: #9e2f1c;
+  --danger-hover: #7d2415;
+  --on-primary: #ffffff;
+  --scrim: rgb(27 31 26 / 0.45);
   --tone-1: #dce8d2;
   --tone-2: #f3e3c3;
   --tone-3: #f1d4c8;
@@ -110,4 +113,53 @@ a:hover {
   ::view-transition-new(*) {
     animation: none !important;
   }
+}
+
+/* Shared form and button classes (auth screens and the confirm dialog). */
+.field {
+  width: 100%;
+  height: 50px;
+  padding: 0 14px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-input);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+}
+.field[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.field-error {
+  margin: 0;
+  font-size: 14px;
+  color: var(--danger);
+}
+
+.submit {
+  margin-top: 8px;
+  height: 52px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.submit:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+.submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.danger {
+  background: var(--danger);
+}
+.danger:hover:not(:disabled) {
+  background: var(--danger-hover);
 }

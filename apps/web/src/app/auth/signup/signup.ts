@@ -4,6 +4,13 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { apiError } from '../api-error';
 
+const REQUIRED = {
+  email: 'Enter your email',
+  password: 'Enter a password',
+  inviteCode: 'Enter your invite code',
+} as const;
+type Field = keyof typeof REQUIRED;
+
 @Component({
   selector: 'app-signup',
   imports: [ReactiveFormsModule, RouterLink],
@@ -19,13 +26,25 @@ export class Signup {
     password: ['', Validators.required],
     inviteCode: ['', Validators.required],
   });
+  protected readonly submitted = signal(false);
   protected readonly busy = signal(false);
   protected readonly error = signal('');
   /** Server messages for fields, keyed by field name. */
-  protected readonly fieldErrors = signal<Record<string, string>>({});
+  protected readonly fieldErrors = signal<Partial<Record<Field, string>>>({});
+
+  /** Server message wins; otherwise the client message once the user has tried to submit. */
+  protected fieldError(name: Field): string | null {
+    const server = this.fieldErrors()[name];
+    if (server) return server;
+    const control = this.form.controls[name];
+    if (!this.submitted() || control.valid) return null;
+    return control.hasError('email') ? 'Enter a valid email' : REQUIRED[name];
+  }
 
   async submit(): Promise<void> {
-    if (this.busy() || this.form.invalid) return;
+    if (this.busy()) return;
+    this.submitted.set(true);
+    if (this.form.invalid) return;
     this.busy.set(true);
     this.error.set('');
     this.fieldErrors.set({});
