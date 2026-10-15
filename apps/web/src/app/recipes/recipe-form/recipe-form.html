@@ -1,0 +1,134 @@
+@if (notFound()) {
+<main class="state">
+  <h1>Recipe not found</h1>
+  <a routerLink="/">Back to your cookbook</a>
+</main>
+} @else if (loadFailed()) {
+<main class="state">
+  <p>Couldn't load this recipe.</p>
+  <a routerLink="/">Back to your cookbook</a>
+</main>
+} @else {
+<header class="bar">
+  <a class="cancel" [routerLink]="recipeId() ? ['/recipes', recipeId()] : '/'">Cancel</a>
+  <h1>{{ id() ? 'Edit recipe' : 'New recipe' }}</h1>
+  <button type="submit" form="rf" class="save" [disabled]="busy()">Save</button>
+</header>
+
+<main>
+  <form id="rf" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <fieldset>
+      <legend>Photo</legend>
+      <div class="photo" [class.has]="photoSrc()">
+        @if (photoSrc(); as src) {
+        <img [src]="src" alt="Recipe photo preview" />
+        } @else {
+        <svg
+          aria-hidden="true"
+          width="36"
+          height="36"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="3" y="5" width="18" height="14" rx="2" />
+          <circle cx="9" cy="10" r="1.6" />
+          <path d="M21 16l-5-5-8 8" />
+        </svg>
+        }
+        <div class="actions">
+          <button type="button" class="pill primary" (click)="camera.click()">Take photo</button>
+          <button type="button" class="pill" (click)="upload.click()">Upload</button>
+          @if (photoSrc()) {
+          <button type="button" class="pill" (click)="removePhoto()">Remove photo</button>
+          }
+        </div>
+        <p class="hint">JPG, PNG or WebP</p>
+        <input
+          #camera
+          hidden
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          capture="environment"
+          aria-label="Take photo"
+          (change)="pick($event)"
+        />
+        <input
+          #upload
+          hidden
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          aria-label="Upload photo"
+          (change)="pick($event)"
+        />
+      </div>
+      @if (pickError()) {
+      <p class="field-error" role="alert">{{ pickError() }}</p>
+      }
+    </fieldset>
+
+    <div class="group">
+      <label for="title">Title</label>
+      <input
+        id="title"
+        class="field"
+        type="text"
+        maxlength="120"
+        autocomplete="off"
+        formControlName="title"
+        [attr.aria-invalid]="!!titleError()"
+        [attr.aria-describedby]="titleError() ? 'title-error' : null"
+      />
+      @if (titleError(); as msg) {
+      <p id="title-error" class="field-error">{{ msg }}</p>
+      }
+    </div>
+
+    <fieldset formArrayName="ingredients">
+      <legend>Ingredients</legend>
+      @for (c of form.controls.ingredients.controls; track c; let i = $index) {
+      <div class="row">
+        <label class="sr-only" [for]="'ing-' + i">Ingredient {{ i + 1 }}</label>
+        <input [id]="'ing-' + i" class="field" type="text" maxlength="200" [formControlName]="i" />
+        <button
+          type="button"
+          class="x"
+          [attr.aria-label]="'Remove ingredient ' + (i + 1)"
+          (click)="remove(form.controls.ingredients, i)"
+        >
+          &times;
+        </button>
+      </div>
+      }
+      <button type="button" class="add" (click)="add(form.controls.ingredients)">
+        + Add ingredient
+      </button>
+    </fieldset>
+
+    <fieldset formArrayName="steps">
+      <legend>Steps</legend>
+      @for (c of form.controls.steps.controls; track c; let i = $index) {
+      <div class="row step">
+        <span aria-hidden="true" class="n">{{ i + 1 }}</span>
+        <label class="sr-only" [for]="'st-' + i">Step {{ i + 1 }}</label>
+        <textarea [id]="'st-' + i" rows="3" maxlength="2000" [formControlName]="i"></textarea>
+        <button
+          type="button"
+          class="x"
+          [attr.aria-label]="'Remove step ' + (i + 1)"
+          (click)="remove(form.controls.steps, i)"
+        >
+          &times;
+        </button>
+      </div>
+      }
+      <button type="button" class="add" (click)="add(form.controls.steps)">+ Add step</button>
+    </fieldset>
+
+    <p class="field-error" role="status" aria-live="polite">{{ error() }}</p>
+  </form>
+</main>
+}
