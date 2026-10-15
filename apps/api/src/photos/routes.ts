@@ -7,12 +7,22 @@ import { requireUser, type AuthedEnv } from '../auth/middleware.js';
 import { recipes } from '../db/schema.js';
 import { HttpError } from '../http/errors.js';
 import { loadOwnedRecipe, toRecipe } from '../recipes/routes.js';
+import type { PhotoStorage } from './storage.js';
 import { processPhoto } from './process.js';
 
 const tooBig = () => new HttpError(413, 'payload_too_large', 'Photo must be 4 MB or smaller');
 
+// Post-commit cleanup: a leftover file must not fail a request that already succeeded.
+export async function discardFile(storage: PhotoStorage, key: string) {
+  try {
+    await storage.delete(key);
+  } catch (e) {
+    console.error('failed to delete photo file', key, e);
+  }
+}
+
 export const photoRoutes = new Hono<AuthedEnv>()
-  .use(requireUser)
+  .use('/:id/photo', requireUser)
   .put(
     '/:id/photo',
     bodyLimit({
@@ -51,7 +61,7 @@ export const photoRoutes = new Hono<AuthedEnv>()
         await storage.delete(newKey).catch(() => {});
         throw new HttpError(404, 'not_found', 'Recipe not found');
       }
-      if (owned.photoKey) await storage.delete(owned.photoKey);
+      if (owned.photoKey) await discardFile(storage, owned.photoKey);
       return c.json(await toRecipe(db, userId, row));
     },
   )
@@ -63,7 +73,7 @@ export const photoRoutes = new Hono<AuthedEnv>()
       .update(recipes)
       .set({ photoKey: null, updatedAt: new Date() })
       .where(and(eq(recipes.id, owned.id), eq(recipes.userId, userId)));
-    if (owned.photoKey) await storage.delete(owned.photoKey);
+    if (owned.photoKey) await discardFile(storage, owned.photoKey);
     return c.body(null, 204);
   })
   .get('/:id/photo', async (c) => {

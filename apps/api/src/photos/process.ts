@@ -7,7 +7,7 @@ const unsupported = () =>
 
 // Re-encodes to WebP: applies EXIF rotation, caps the size, and drops all metadata (sharp's default).
 export async function processPhoto(bytes: Buffer): Promise<Buffer> {
-  const img = sharp(bytes);
+  const img = sharp(bytes, { limitInputPixels: 40_000_000 });
   let format: string | undefined;
   try {
     format = (await img.metadata()).format;

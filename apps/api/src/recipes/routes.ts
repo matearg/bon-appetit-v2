@@ -5,6 +5,7 @@ import { Hono } from 'hono';
 import { requireUser, type AuthedEnv } from '../auth/middleware.js';
 import type { Db } from '../db/client.js';
 import { listRecipes, lists, recipes } from '../db/schema.js';
+import { discardFile } from '../photos/routes.js';
 import { HttpError, validationHook } from '../http/errors.js';
 
 type RecipeRow = typeof recipes.$inferSelect;
@@ -139,6 +140,6 @@ export const recipeRoutes = new Hono<AuthedEnv>()
     const userId = c.var.user.id;
     const owned = await loadOwnedRecipe(db, userId, c.req.param('id'));
     await db.delete(recipes).where(and(eq(recipes.id, owned.id), eq(recipes.userId, userId)));
-    if (owned.photoKey) await c.var.deps.storage.delete(owned.photoKey);
+    if (owned.photoKey) await discardFile(c.var.deps.storage, owned.photoKey);
     return c.body(null, 204);
   });

@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { afterAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Recipe, RecipeSummary } from '@bonappetit/shared';
 import { recipes } from '../src/db/schema.js';
 import { makeTestApp, req, signupAs, truncateAll } from './helpers.js';
@@ -15,6 +15,17 @@ const list = async (cookie: string, query = ''): Promise<RecipeSummary[]> =>
   (await req(app, 'GET', `/api/recipes${query}`, { cookie })).json();
 const titles = async (cookie: string, q: string) =>
   (await list(cookie, `?q=${encodeURIComponent(q)}`)).map((r) => r.title);
+
+describe('auth middleware', () => {
+  it('validates the session once per recipe request', async () => {
+    const { cookie } = await signupAs(app);
+    const spy = vi.spyOn(db, 'select');
+    await list(cookie);
+    // 1 session lookup + 2 db.select calls in the list query; a duplicated requireUser makes it 4
+    expect(spy).toHaveBeenCalledTimes(3);
+    spy.mockRestore();
+  });
+});
 
 describe('recipes CRUD', () => {
   it('creates with trimmed title and ordered arrays, then reads it back', async () => {
