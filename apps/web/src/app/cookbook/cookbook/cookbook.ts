@@ -1,14 +1,13 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import type { RecipeSummary } from '@bonappetit/shared';
 import { of } from 'rxjs';
+import { isNotFound } from '../../auth/api-error';
 import { ListsService } from '../../core/lists.service';
 import { RecipesService } from '../../core/recipes.service';
+import { plural } from '../../shared/plural';
 import { RecipeCard } from '../recipe-card/recipe-card';
-
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
 /** Serves `/` (optionally `?q=` and `?filter=favorites`) and `/lists/:id`. */
 @Component({
@@ -55,10 +54,7 @@ export class Cookbook {
   protected readonly heading = computed(() =>
     !this.id() ? 'Your cookbook' : this.notFound() ? 'List not found' : (this.listName() ?? 'List'),
   );
-  protected readonly notFound = computed(() => {
-    const e = this.recipes.error()?.cause ?? this.recipes.error();
-    return e instanceof HttpErrorResponse && e.status === 404;
-  });
+  protected readonly notFound = computed(() => isNotFound(this.recipes.error()));
   protected readonly failed = computed(
     () => this.listsFailed() || (!!this.recipes.error() && !this.notFound()),
   );
@@ -66,6 +62,9 @@ export class Cookbook {
     () => !this.failed() && (!this.listsLoaded() || this.recipes.isLoading()),
   );
   protected readonly subtitle = computed(() => {
+    // On a list page the counts describe that list, not the whole cookbook.
+    const own = this.id() ? this.listsApi.lists().find((l) => l.id === this.id()) : undefined;
+    if (own) return plural(own.recipeCount, 'recipe');
     const lists = this.listsApi.lists().filter((l) => !l.isFavorites).length;
     return `${plural(this.all.hasValue() ? this.all.value().length : 0, 'recipe')}, ${plural(lists, 'list')}`;
   });

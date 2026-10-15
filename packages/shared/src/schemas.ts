@@ -6,7 +6,6 @@ const id = z.uuid();
 const trimmed = (max: number) => z.string().trim().min(1).max(max);
 
 export const emailSchema = z.string().trim().toLowerCase().pipe(z.email().max(254));
-export type Email = z.infer<typeof emailSchema>;
 
 export const signupBodySchema = z.object({
   email: emailSchema,
@@ -68,14 +67,14 @@ export type Recipe = z.infer<typeof recipeSchema>;
 
 export const recipeQuerySchema = z.object({
   q: z.string().trim().max(120).optional(),
-  listId: id.optional(),
+  // Not z.uuid(): the route answers a malformed id with 404, like every other lookup.
+  listId: z.string().optional(),
 });
 export type RecipeQuery = z.infer<typeof recipeQuerySchema>;
 
 export const listInputSchema = z.object({
   name: trimmed(60),
 });
-export type ListInput = z.infer<typeof listInputSchema>;
 
 export const listSummarySchema = z.object({
   id,
@@ -95,11 +94,3 @@ export const ERROR_CODES = [
   'unsupported_media_type',
 ] as const;
 export type ErrorCode = (typeof ERROR_CODES)[number];
-
-export type ApiError = {
-  error: {
-    code: ErrorCode;
-    message: string;
-    fields?: Record<string, string[]>;
-  };
-};

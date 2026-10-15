@@ -58,6 +58,7 @@ export const recipeRoutes = new Hono<AuthedEnv>()
     const { q, listId } = c.req.valid('query');
 
     if (listId) {
+      if (!UUID.test(listId)) throw new HttpError(404, 'not_found', 'List not found');
       const [own] = await db
         .select({ id: lists.id })
         .from(lists)

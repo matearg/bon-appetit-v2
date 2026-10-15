@@ -90,25 +90,3 @@ describe('Login validation feedback', () => {
     expect(login).not.toHaveBeenCalled();
   });
 });
-
-describe('Login validation feedback', () => {
-  it('shows a message under each empty field when submitted empty', async () => {
-    const login = vi.fn();
-    await TestBed.configureTestingModule({
-      imports: [Login],
-      providers: [provideRouter([]), { provide: AuthService, useValue: { login } }],
-    }).compileComponents();
-    const fixture = TestBed.createComponent(Login);
-    fixture.detectChanges();
-    const el = fixture.nativeElement as HTMLElement;
-    el.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
-    await flush();
-    fixture.detectChanges();
-
-    expect(el.querySelector('#login-email-error')?.textContent?.trim()).toBe('Enter your email');
-    expect(el.querySelector('#login-password-error')?.textContent?.trim()).toBe(
-      'Enter your password',
-    );
-    expect(login).not.toHaveBeenCalled();
-  });
-});

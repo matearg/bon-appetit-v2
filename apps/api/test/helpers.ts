@@ -11,7 +11,7 @@ import { createDb, type Db } from '../src/db/client.js';
 export const TEST_ORIGIN = 'http://localhost:4200';
 
 export const TEST_DATABASE_URL =
-  process.env.TEST_DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5432/bonappetit_test';
+  process.env.TEST_DATABASE_URL ?? 'postgres://postgres:postgres@localhost:5433/bonappetit_test';
 
 export async function makeTestApp(
   overrides: Partial<AppDeps> = {},

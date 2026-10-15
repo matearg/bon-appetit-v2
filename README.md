@@ -45,6 +45,10 @@ The web app runs at http://localhost:4200 and the API at http://localhost:3000.
 
 **Demo login** (after `npm run db:seed`): `demo@bonappetit.local` / `demo-password-123`
 
+### Testing from a phone on your network
+
+The API rejects requests whose origin isn't `APP_ORIGIN`, so over the LAN most actions (favorites, deletes, logout, photo upload) fail with 403. Serve the web app with `npm start -w @bonappetit/web -- --host 0.0.0.0` and set `APP_ORIGIN=http://<your-LAN-IP>:4200` in `apps/api/.env`, then restart the API.
+
 ## Project layout
 
 - `packages/shared`: Zod schemas and types shared by the API and the web app
@@ -58,4 +62,4 @@ The web app runs at http://localhost:4200 and the API at http://localhost:3000.
 - [ ] Add the Vercel adapter entry point
 - [ ] Point `DATABASE_URL` at a hosted PostgreSQL database
 - [ ] Add the bucket storage implementation for photos
-- [ ] Set `Secure` cookies
+- [ ] Set `NODE_ENV=production` (this turns on `Secure` cookies) and `APP_ORIGIN` to the web app's public URL

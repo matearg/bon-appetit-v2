@@ -2,14 +2,13 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { RecipeSummary } from '@bonappetit/shared';
 import { RecipesService } from '../../core/recipes.service';
+import { plural } from '../../shared/plural';
 
 /** Placeholder background for a recipe without a photo; stable per id. */
 export function toneOf(id: string): string {
   const sum = [...id].reduce((n, c) => n + c.charCodeAt(0), 0);
   return `var(--tone-${(sum % 5) + 1})`;
 }
-
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
 @Component({
   selector: 'app-recipe-card',

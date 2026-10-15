@@ -6,9 +6,8 @@ import { recipeRoutes } from './recipes/routes.js';
 import { photoRoutes } from './photos/routes.js';
 import type { PhotoStorage } from './photos/storage.js';
 import type { Db } from './db/client.js';
-import { onError } from './http/errors.js';
-
-export type { PhotoStorage };
+import { bodyLimit } from 'hono/body-limit';
+import { HttpError, onError } from './http/errors.js';
 
 export type AppDeps = {
   db: Db;
@@ -28,6 +27,16 @@ export function createApp(deps: AppDeps) {
   });
 
   app.use('/api/*', csrf({ origin: deps.appOrigin }));
+  // JSON bodies are tiny (a max recipe is ~120 KB); photo uploads set their own limit.
+  const jsonLimit = bodyLimit({
+    maxSize: 256 * 1024,
+    onError: () => {
+      throw new HttpError(413, 'payload_too_large', 'Request body too large');
+    },
+  });
+  app.use('/api/*', (c, next) =>
+    c.req.header('content-type')?.startsWith('application/json') ? jsonLimit(c, next) : next(),
+  );
 
   const api = new Hono<AppEnv>();
   api.get('/health', (c) => c.json({ ok: true }));
@@ -36,6 +45,7 @@ export function createApp(deps: AppDeps) {
   api.route('/recipes', recipeRoutes);
   api.route('/lists', listRoutes);
   app.route('/api', api);
+  app.notFound((c) => onError(new HttpError(404, 'not_found', 'Not found'), c));
 
   app.onError(onError);
   return app;

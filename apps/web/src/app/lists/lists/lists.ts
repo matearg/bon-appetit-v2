@@ -3,8 +3,8 @@ import { RouterLink } from '@angular/router';
 import type { ListSummary } from '@bonappetit/shared';
 import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
 import { ListsService } from '../../core/lists.service';
-
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+import { apiError } from '../../auth/api-error';
+import { plural } from '../../shared/plural';
 
 @Component({
   selector: 'app-lists',
@@ -109,7 +109,7 @@ export class Lists {
       await action();
       done();
     } catch (err) {
-      this.error.set(messageOf(err));
+      this.error.set(apiError(err).message || 'Something went wrong. Try again.');
     }
   }
 
@@ -126,12 +126,7 @@ export class Lists {
     try {
       await this.api.remove(l.id);
     } catch (err) {
-      this.error.set(messageOf(err));
+      this.error.set(apiError(err).message || 'Something went wrong. Try again.');
     }
   }
-}
-
-function messageOf(err: unknown): string {
-  const body = (err as { error?: { error?: { message?: string } } } | null)?.error;
-  return body?.error?.message ?? 'Something went wrong. Try again.';
 }

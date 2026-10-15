@@ -1,4 +1,3 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
   computed,
@@ -12,11 +11,11 @@ import {
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { toneOf } from '../../cookbook/recipe-card/recipe-card';
+import { isNotFound } from '../../auth/api-error';
 import { ListsService } from '../../core/lists.service';
 import { RecipesService } from '../../core/recipes.service';
 import { ConfirmDialog } from '../../shared/confirm-dialog/confirm-dialog';
-
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+import { plural } from '../../shared/plural';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -43,10 +42,7 @@ export class RecipeDetail {
   );
   /** Optimistic copy of the recipe's list membership (includes Favorites). */
   private readonly listIds = linkedSignal(() => this.recipe()?.listIds ?? []);
-  protected readonly notFound = computed(() => {
-    const e = this.loaded.error()?.cause ?? this.loaded.error();
-    return e instanceof HttpErrorResponse && e.status === 404;
-  });
+  protected readonly notFound = computed(() => isNotFound(this.loaded.error()));
   protected readonly failed = computed(() => !!this.loaded.error() && !this.notFound());
 
   protected readonly menuOpen = signal(false);
@@ -57,7 +53,10 @@ export class RecipeDetail {
   protected readonly customLists = computed(() =>
     this.listsApi.lists().filter((l) => !l.isFavorites),
   );
-  protected readonly isFavorite = computed(() => this.listIds().includes(this.favoritesId() ?? ''));
+  protected readonly isFavorite = computed(() => {
+    const fav = this.favoritesId();
+    return fav ? this.listIds().includes(fav) : !!this.recipe()?.isFavorite;
+  });
   protected readonly photo = computed(() => {
     const r = this.recipe();
     return r?.hasPhoto ? this.recipes.photoUrl(r) : null;
