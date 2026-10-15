@@ -3,11 +3,12 @@ import { csrf } from 'hono/csrf';
 import { authRoutes } from './auth/routes.js';
 import { listRoutes } from './lists/routes.js';
 import { recipeRoutes } from './recipes/routes.js';
+import { photoRoutes } from './photos/routes.js';
+import type { PhotoStorage } from './photos/storage.js';
 import type { Db } from './db/client.js';
 import { onError } from './http/errors.js';
 
-// Placeholder until photo storage lands (Task 7).
-export type PhotoStorage = unknown;
+export type { PhotoStorage };
 
 export type AppDeps = {
   db: Db;
@@ -31,6 +32,7 @@ export function createApp(deps: AppDeps) {
   const api = new Hono<AppEnv>();
   api.get('/health', (c) => c.json({ ok: true }));
   api.route('/auth', authRoutes);
+  api.route('/recipes', photoRoutes);
   api.route('/recipes', recipeRoutes);
   api.route('/lists', listRoutes);
   app.route('/api', api);

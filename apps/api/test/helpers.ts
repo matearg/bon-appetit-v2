@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { sql } from 'drizzle-orm';
 import type { Hono } from 'hono';
 import type { User } from '@bonappetit/shared';
+import { createLocalStorage } from '../src/photos/storage.js';
 import { createApp, type AppDeps, type AppEnv } from '../src/app.js';
 import { createDb, type Db } from '../src/db/client.js';
 
@@ -14,18 +15,18 @@ export const TEST_DATABASE_URL =
 
 export async function makeTestApp(
   overrides: Partial<AppDeps> = {},
-): Promise<{ app: Hono<AppEnv>; db: Db; close: () => Promise<void> }> {
+): Promise<{ app: Hono<AppEnv>; db: Db; photoDir: string; close: () => Promise<void> }> {
   const { db, close } = createDb(TEST_DATABASE_URL);
   const photoDir = await mkdtemp(join(tmpdir(), 'bonappetit-photos-'));
   const app = createApp({
     db,
-    storage: photoDir,
+    storage: createLocalStorage(photoDir),
     inviteCode: 'test-invite',
     appOrigin: TEST_ORIGIN,
     secureCookies: false,
     ...overrides,
   });
-  return { app, db, close };
+  return { app, db, photoDir, close };
 }
 
 export async function truncateAll(db: Db): Promise<void> {
@@ -48,6 +49,21 @@ export function req(
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
     }),
+  );
+}
+
+// Multipart upload with our Origin by default (override to test CSRF).
+export function uploadPhoto(
+  app: Hono<AppEnv>,
+  path: string,
+  cookie: string,
+  bytes: Uint8Array | string,
+  origin = TEST_ORIGIN,
+): Promise<Response> {
+  const form = new FormData();
+  form.set('photo', new Blob([bytes as BlobPart]), 'photo.jpg');
+  return Promise.resolve(
+    app.request(path, { method: 'PUT', headers: { origin, cookie }, body: form }),
   );
 }
 

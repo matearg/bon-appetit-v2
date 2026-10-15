@@ -27,7 +27,7 @@ export async function loadOwnedRecipe(
   return row;
 }
 
-async function toRecipe(db: Db, userId: string, row: RecipeRow): Promise<Recipe> {
+export async function toRecipe(db: Db, userId: string, row: RecipeRow): Promise<Recipe> {
   const member = await db
     .select({ id: lists.id, isFavorites: lists.isFavorites })
     .from(listRecipes)
@@ -139,5 +139,6 @@ export const recipeRoutes = new Hono<AuthedEnv>()
     const userId = c.var.user.id;
     const owned = await loadOwnedRecipe(db, userId, c.req.param('id'));
     await db.delete(recipes).where(and(eq(recipes.id, owned.id), eq(recipes.userId, userId)));
+    if (owned.photoKey) await c.var.deps.storage.delete(owned.photoKey);
     return c.body(null, 204);
   });
