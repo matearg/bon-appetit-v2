@@ -10,9 +10,13 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run"
   },
   "dependencies": {
     "zod": "^4"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.4"
   }
 }
