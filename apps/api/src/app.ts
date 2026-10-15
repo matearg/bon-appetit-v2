@@ -1,4 +1,6 @@
 import { Hono } from 'hono';
+import { csrf } from 'hono/csrf';
+import { authRoutes } from './auth/routes.js';
 import type { Db } from './db/client.js';
 import { onError } from './http/errors.js';
 
@@ -13,15 +15,20 @@ export type AppDeps = {
   secureCookies: boolean;
 };
 
+export type AppEnv = { Variables: { deps: AppDeps } };
+
 export function createApp(deps: AppDeps) {
-  const app = new Hono<{ Variables: { deps: AppDeps } }>();
+  const app = new Hono<AppEnv>();
   app.use(async (c, next) => {
     c.set('deps', deps);
     await next();
   });
 
-  const api = new Hono<{ Variables: { deps: AppDeps } }>();
+  app.use('/api/*', csrf({ origin: deps.appOrigin }));
+
+  const api = new Hono<AppEnv>();
   api.get('/health', (c) => c.json({ ok: true }));
+  api.route('/auth', authRoutes);
   app.route('/api', api);
 
   app.onError(onError);
