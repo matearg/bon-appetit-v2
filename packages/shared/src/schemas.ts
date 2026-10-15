@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
-export const PHOTO_MAX_BYTES = 4 * 1024 * 1024;
-export const PHOTO_MAX_EDGE = 1600;
+export * from './constants.js';
 
 const id = z.uuid();
 const trimmed = (max: number) => z.string().trim().min(1).max(max);

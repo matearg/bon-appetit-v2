@@ -160,7 +160,10 @@ export class RecipeForm {
       } catch (err) {
         const { status, fields } = apiError(err);
         if (status === 400 && fields['title']) this.titleServerError.set(fields['title']);
-        else this.error.set('Something went wrong. Try again.');
+        else
+          this.error.set(
+            fields['ingredients'] ?? fields['steps'] ?? 'Something went wrong. Try again.',
+          );
         return;
       }
       if (!this.recipeId()) {

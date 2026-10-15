@@ -1,4 +1,4 @@
-import { PHOTO_MAX_EDGE } from '@bonappetit/shared';
+import { PHOTO_MAX_EDGE } from '@bonappetit/shared/constants';
 
 export function fitWithin(w: number, h: number, max: number): { width: number; height: number } {
   const scale = Math.min(1, max / Math.max(w, h));

@@ -16,6 +16,7 @@
       type="button"
       class="pill"
       [attr.aria-pressed]="isFavorite()"
+      [disabled]="!favoritesId()"
       (click)="setMember(favoritesId(), !isFavorite(), 'Favorites')"
     >
       <svg
