@@ -1,0 +1,8 @@
+dist
+node_modules
+.angular
+coverage
+package-lock.json
+apps/api/drizzle/meta
+.superpowers
+docs/superpowers

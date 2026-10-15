@@ -1,0 +1,26 @@
+{
+  "name": "bonappetit",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build:shared": "npm run build -w @bonappetit/shared",
+    "dev": "npm run dev -w @bonappetit/api",
+    "test": "npm run test -w @bonappetit/api",
+    "db:generate": "npm run db:generate -w @bonappetit/api",
+    "db:migrate": "npm run db:migrate -w @bonappetit/api",
+    "db:seed": "npm run db:seed -w @bonappetit/api",
+    "format": "prettier --write .",
+    "lint": "prettier --check ."
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6",
+    "prettier": "^3.9.10",
+    "typescript": "~5.9"
+  }
+}
