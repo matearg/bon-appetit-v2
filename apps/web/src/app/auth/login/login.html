@@ -1,0 +1,33 @@
+<main class="auth">
+  <p class="brand">Bon<span>Appetit</span></p>
+  <h1 class="headline">Your recipes,<br />all in one place.</h1>
+  <p class="lead">Log in to open your cookbook.</p>
+
+  <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="row">
+      <label for="login-email">Email</label>
+      <input
+        id="login-email"
+        class="field"
+        type="email"
+        autocomplete="email"
+        placeholder="you@example.com"
+        formControlName="email"
+      />
+    </div>
+    <div class="row">
+      <label for="login-password">Password</label>
+      <input
+        id="login-password"
+        class="field"
+        type="password"
+        autocomplete="current-password"
+        formControlName="password"
+      />
+    </div>
+    <p class="message error" role="alert" aria-live="polite">{{ error() }}</p>
+    <button class="submit" type="submit" [disabled]="busy()">Log in</button>
+  </form>
+
+  <p class="switch">New here? <a class="link" routerLink="/signup">Create an account</a></p>
+</main>

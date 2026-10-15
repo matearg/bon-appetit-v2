@@ -1,0 +1,50 @@
+<main class="auth">
+  <p class="brand">
+    <a routerLink="/" class="link">Bon<span>Appetit</span></a>
+  </p>
+  <h1 class="headline">Account</h1>
+
+  <p class="lead">Signed in as {{ auth.user()?.email }}</p>
+
+  <form class="form" [formGroup]="form" (ngSubmit)="changePassword()">
+    <h2 class="section-title">Change password</h2>
+    <div class="row">
+      <label for="account-current">Current password</label>
+      <input
+        id="account-current"
+        class="field"
+        type="password"
+        autocomplete="current-password"
+        formControlName="currentPassword"
+      />
+    </div>
+    <div class="row">
+      <label for="account-new">New password</label>
+      <input
+        id="account-new"
+        class="field"
+        type="password"
+        autocomplete="new-password"
+        formControlName="newPassword"
+        [attr.aria-invalid]="!!fieldErrors()['newPassword']"
+        [attr.aria-describedby]="fieldErrors()['newPassword'] ? 'account-new-error' : null"
+      />
+      @if (fieldErrors()['newPassword']; as msg) {
+      <p id="account-new-error" class="field-error">{{ msg }}</p>
+      }
+    </div>
+    <p
+      class="message"
+      [class.ok]="message()?.ok"
+      [class.error]="message()?.ok === false"
+      aria-live="polite"
+    >
+      {{ message()?.text }}
+    </p>
+    <button class="submit" type="submit" [disabled]="busy()">Change password</button>
+  </form>
+
+  <button class="submit danger logout" type="button" [disabled]="busy()" (click)="logout()">
+    Log out
+  </button>
+</main>

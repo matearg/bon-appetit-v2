@@ -1,0 +1,58 @@
+<main class="auth">
+  <p class="brand">Bon<span>Appetit</span></p>
+  <h1 class="headline">Join the cookbook.</h1>
+  <p class="lead">Create an account with your invite code.</p>
+
+  <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="row">
+      <label for="signup-email">Email</label>
+      <input
+        id="signup-email"
+        class="field"
+        type="email"
+        autocomplete="email"
+        placeholder="you@example.com"
+        formControlName="email"
+        [attr.aria-invalid]="!!fieldErrors()['email']"
+        [attr.aria-describedby]="fieldErrors()['email'] ? 'signup-email-error' : null"
+      />
+      @if (fieldErrors()['email']; as msg) {
+      <p id="signup-email-error" class="field-error">{{ msg }}</p>
+      }
+    </div>
+    <div class="row">
+      <label for="signup-password">Password</label>
+      <input
+        id="signup-password"
+        class="field"
+        type="password"
+        autocomplete="new-password"
+        formControlName="password"
+        [attr.aria-invalid]="!!fieldErrors()['password']"
+        [attr.aria-describedby]="fieldErrors()['password'] ? 'signup-password-error' : null"
+      />
+      @if (fieldErrors()['password']; as msg) {
+      <p id="signup-password-error" class="field-error">{{ msg }}</p>
+      }
+    </div>
+    <div class="row">
+      <label for="signup-invite">Invite code</label>
+      <input
+        id="signup-invite"
+        class="field"
+        type="text"
+        autocomplete="off"
+        formControlName="inviteCode"
+        [attr.aria-invalid]="!!fieldErrors()['inviteCode']"
+        [attr.aria-describedby]="fieldErrors()['inviteCode'] ? 'signup-invite-error' : null"
+      />
+      @if (fieldErrors()['inviteCode']; as msg) {
+      <p id="signup-invite-error" class="field-error">{{ msg }}</p>
+      }
+    </div>
+    <p class="message error" role="alert" aria-live="polite">{{ error() }}</p>
+    <button class="submit" type="submit" [disabled]="busy()">Create account</button>
+  </form>
+
+  <p class="switch">Already have an account? <a class="link" routerLink="/login">Log in</a></p>
+</main>
