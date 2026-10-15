@@ -1,4 +1,3 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
   computed,
@@ -17,12 +16,11 @@ import {
   FormControl,
   NonNullableFormBuilder,
   ReactiveFormsModule,
-  Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Location } from '@angular/common';
 import { of } from 'rxjs';
-import { apiError } from '../../auth/api-error';
+import { apiError, isNotFound } from '../../auth/api-error';
 import { resizePhoto } from '../../core/photo-resize';
 import { RecipesService } from '../../core/recipes.service';
 import { toRecipeInput } from '../to-recipe-input';
@@ -60,10 +58,7 @@ export class RecipeForm {
     params: () => this.id(),
     stream: ({ params }) => (params ? this.api.get(params) : of(undefined)),
   });
-  protected readonly notFound = computed(() => {
-    const e = this.loaded.error()?.cause ?? this.loaded.error();
-    return e instanceof HttpErrorResponse && e.status === 404;
-  });
+  protected readonly notFound = computed(() => isNotFound(this.loaded.error()));
   protected readonly loadFailed = computed(() => !!this.loaded.error() && !this.notFound());
   private readonly existing = computed(() =>
     this.loaded.hasValue() ? this.loaded.value() : undefined,

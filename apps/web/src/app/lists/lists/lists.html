@@ -87,6 +87,8 @@
           [attr.aria-invalid]="error() ? true : null"
           [attr.aria-describedby]="error() ? 'list-error' : null"
         />
+        <button type="submit" class="act primary">Save</button>
+        <button type="button" class="act" (click)="cancel()">Cancel</button>
       </form>
       } @else {
       <a class="link" [routerLink]="['/lists', l.id]">

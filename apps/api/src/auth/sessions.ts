@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { and, eq, ne } from 'drizzle-orm';
+import { and, eq, lt, ne } from 'drizzle-orm';
 import type { Context } from 'hono';
 import { deleteCookie, setCookie } from 'hono/cookie';
 import type { Db } from '../db/client.js';
@@ -19,6 +19,8 @@ export async function createSession(
   const token = randomBytes(32).toString('base64url');
   const expiresAt = new Date(Date.now() + SESSION_TTL);
   await db.insert(sessions).values({ id: hashToken(token), userId, expiresAt });
+  // Abandoned sessions are only otherwise deleted when their cookie comes back.
+  await db.delete(sessions).where(lt(sessions.expiresAt, new Date()));
   return { token, expiresAt };
 }
 

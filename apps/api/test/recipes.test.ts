@@ -140,6 +140,29 @@ describe('isFavorite and listId', () => {
       (await req(app, 'GET', `/api/recipes?listId=${aList.id}`, { cookie: b.cookie })).status,
     ).toBe(404);
   });
+
+  it('404s for a malformed listId instead of 400', async () => {
+    const { cookie } = await signupAs(app);
+    expect((await req(app, 'GET', '/api/recipes?listId=abc', { cookie })).status).toBe(404);
+  });
+});
+
+describe('api edges', () => {
+  it('answers unknown /api paths with the JSON error shape', async () => {
+    const res = await req(app, 'GET', '/api/nope');
+    expect(res.status).toBe(404);
+    expect(await res.json()).toMatchObject({ error: { code: 'not_found' } });
+  });
+
+  it('rejects an oversized JSON body with 413', async () => {
+    const { cookie } = await signupAs(app);
+    const res = await create(
+      cookie,
+      'x',
+      ['a'.repeat(200)].concat(Array(1500).fill('a'.repeat(200))),
+    );
+    expect(res.status).toBe(413);
+  });
 });
 
 describe('isolation', () => {
