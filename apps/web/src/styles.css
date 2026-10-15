@@ -1,0 +1,116 @@
+/* "Herb & Ink" design tokens (spec §7) */
+:root {
+  --bg: #f5f7f2;
+  --surface: #ffffff;
+  --border: #e1e5dc;
+  --border-input: #d5dbcf;
+  --text: #1b1f1a;
+  --muted: #5b6259;
+  --primary: #2f6b3a;
+  --primary-hover: #1f4a28;
+  --favorite: #d2462a;
+  --danger: #9e2f1c;
+  --tone-1: #dce8d2;
+  --tone-2: #f3e3c3;
+  --tone-3: #f1d4c8;
+  --tone-4: #d6e4e8;
+  --tone-5: #e7ddeb;
+  --font-display: 'Bricolage Grotesque', sans-serif;
+  --font-body: Figtree, system-ui, sans-serif;
+  --radius-card: 20px;
+  --radius-input: 14px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+a {
+  color: var(--primary);
+}
+a:hover {
+  color: var(--primary-hover);
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Motion: cards lift on hover; scroll-driven reveal and hero zoom (spec §7). */
+.lift:hover {
+  box-shadow: 0 12px 28px rgb(27 31 26 / 0.1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lift {
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+  .lift:hover {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes zoom {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+    .hero-zoom {
+      animation: zoom linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+  }
+}
+
+/* Route cross-fade comes from withViewTransitions(); drop it when motion is reduced. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

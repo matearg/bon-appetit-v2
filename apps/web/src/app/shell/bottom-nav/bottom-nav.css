@@ -1,0 +1,38 @@
+/* margin-top:auto + sticky keeps the bar at the viewport bottom on short and long pages. */
+:host {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin-top: auto;
+}
+
+nav {
+  display: flex;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding: 6px 8px 18px;
+}
+
+a {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 52px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+a.active {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+@media (min-width: 720px) {
+  :host {
+    display: none;
+  }
+}

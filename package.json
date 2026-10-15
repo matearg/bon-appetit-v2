@@ -10,8 +10,9 @@
   },
   "scripts": {
     "build:shared": "npm run build -w @bonappetit/shared",
-    "dev": "npm run dev -w @bonappetit/api",
-    "test": "npm run test -w @bonappetit/api",
+    "dev:shared": "tsc -p packages/shared -w --preserveWatchOutput",
+    "dev": "npm run build:shared && concurrently -n shared,api,web \"npm:dev:shared\" \"npm run dev -w @bonappetit/api\" \"npm start -w @bonappetit/web\"",
+    "test": "npm run test -w @bonappetit/shared -w @bonappetit/api -w @bonappetit/web",
     "db:generate": "npm run db:generate -w @bonappetit/api",
     "db:migrate": "npm run db:migrate -w @bonappetit/api",
     "db:seed": "npm run db:seed -w @bonappetit/api",

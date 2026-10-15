@@ -1,0 +1,116 @@
+header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: rgb(245 247 242 / 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+}
+
+.bar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  text-decoration: none;
+}
+.logo span {
+  color: var(--primary);
+}
+
+.search {
+  flex: 1 1 280px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border-input);
+  border-radius: 999px;
+  padding: 0 16px;
+  height: 46px;
+  color: var(--muted);
+}
+.search:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  font: inherit;
+  font-size: 16px;
+  background: transparent;
+  color: var(--text);
+}
+
+.new {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 20px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+.new:hover {
+  background: var(--primary-hover);
+  color: #fff;
+}
+
+.account {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid var(--border-input);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+/* Phone: logo, New and account on one row, search full width below it. */
+@media (max-width: 719.98px) {
+  .bar {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  .logo {
+    margin-right: auto;
+    font-size: 22px;
+  }
+  .search {
+    order: 1;
+    flex-basis: 100%;
+  }
+  .new {
+    width: 46px;
+    padding: 0;
+  }
+  .new-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
